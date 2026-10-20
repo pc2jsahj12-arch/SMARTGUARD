@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartGuard Helmet — الخوذة الذكية لحماية العمال</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* لوحة ألوان السلامة الصناعية */
+    --bg-deep: #0a0a0f;
+    --bg-dark: #0f1118;
+    --bg-card: #151824;
+    --bg-hover: #1c2030;
+    --border: #232838;
+    --border-light: #2d3450;
+
+    --primary: #ff8c1a;      /* برتقالي السلامة */
+    --primary-glow: rgba(255, 140, 26, 0.4);
+    --secondary: #ffd60a;    /* أصفر التحذير */
+    --danger: #ff2e4d;       /* أحمر الخطر */
+    --danger-glow: rgba(255, 46, 77, 0.4);
+    --success: #00d68f;      /* أخضر الأمان */
+    --success-glow: rgba(0, 214, 143, 0.4);
+    --info: #00b8ff;         /* أزرق تقني */
+
+    --text: #f0f4ff;
+    --text-mid: #a5b0cc;
+    --text-soft: #6b7599;
+
+    --grad-primary: linear-gradient(135deg, #ff8c1a, #ff2e4d);
+    --grad-success: linear-gradient(135deg, #00d68f, #00b8ff);
+    --grad-dark: linear-gradient(160deg, #151824, #0f1118);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'IBM Plex Sans Arabic', 'Cairo', system-ui, sans-serif;
+    line-height: 1.8;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ============ DECK ============ */
+  #deck {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 55px 80px 90px;
+    opacity: 0;
+    transform: scale(1.02);
+    pointer-events: none;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    background:
+      radial-gradient(1100px 700px at 15% -10%, rgba(255, 140, 26, 0.1), transparent 60%),
+      radial-gradient(900px 600px at 110% 115%, rgba(255, 46, 77, 0.08), transparent 55%),
+      radial-gradient(700px 500px at 50% 50%, rgba(0, 184, 255, 0.04), transparent 70%),
+      linear-gradient(160deg, #08080e 0%, #0a0a0f 45%, #08080c 100%);
+    overflow: hidden;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  /* شبكة تقنية */
+  .slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    background-image:
+      linear-gradient(rgba(255, 140, 26, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 140, 26, 0.04) 1px, transparent 1px);
+    background-size: 65px 65px;
+    mask-image: radial-gradient(circle at 50% 50%, #000 15%, transparent 88%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 15%, transparent 88%);
+    pointer-events: none;
+  }
+
+  /* شريط علوي */
+  .slide::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), var(--danger), transparent);
+    opacity: 0.85;
+  }
+
+  /* ============ TOPBAR ============ */
+  .topbar {
+    position: absolute;
+    top: 22px;
+    right: 34px;
+    left: 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: rgba(255, 140, 26, 0.55);
+    z-index: 20;
+  }
+  .topbar .l { display: flex; gap: 16px; align-items: center; }
+  .topbar .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* ============ TAGS ============ */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    border: 1px solid rgba(255, 140, 26, 0.3);
+    border-radius: 40px;
+    background: rgba(255, 140, 26, 0.06);
+    backdrop-filter: blur(12px);
+    font-family: 'Space Grotesk', 'JetBrains Mono', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+  .tag i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 10px var(--primary);
+  }
+
+  h1, h2, h3, h4 { font-family: 'Cairo', 'Space Grotesk', sans-serif; }
+
+  .slide-title {
+    font-size: clamp(28px, 3.6vw, 48px);
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-top: 16px;
+  }
+  .slide-title .ac { color: var(--primary); text-shadow: 0 0 30px var(--primary-glow); }
+  .slide-title .danger { color: var(--danger); text-shadow: 0 0 30px var(--danger-glow); }
+  .slide-title .success { color: var(--success); text-shadow: 0 0 30px var(--success-glow); }
+  .slide-title .gold { color: var(--secondary); }
+
+  .slide-sub {
+    color: var(--text-mid);
+    font-size: 15px;
+    line-height: 1.9;
+    max-width: 950px;
+    margin-top: 12px;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  .glass {
+    background: rgba(255, 140, 26, 0.04);
+    border: 1px solid rgba(255, 140, 26, 0.18);
+    border-radius: 18px;
+    backdrop-filter: blur(16px);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .glass::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 140, 26, 0.5), transparent);
+  }
+
+  /* ============ NAV ============ */
+  .pager {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 90vw;
+  }
+  .pager span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 140, 26, 0.22);
+    transition: 0.35s;
+    cursor: pointer;
+  }
+  .pager span.on {
+    background: var(--primary);
+    width: 26px;
+    border-radius: 3px;
+    box-shadow: 0 0 12px var(--primary);
+  }
+
+  .nav {
+    position: fixed;
+    bottom: 20px;
+    right: 28px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+  }
+  .nav button {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 140, 26, 0.25);
+    background: rgba(255, 140, 26, 0.08);
+    color: var(--primary);
+    font-size: 16px;
+    cursor: pointer;
+    backdrop-filter: blur(14px);
+    transition: 0.25s;
+    display: grid;
+    place-items: center;
+  }
+  .nav button:hover {
+    background: rgba(255, 140, 26, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--primary-glow);
+  }
+  .nav button.on {
+    background: rgba(255, 140, 26, 0.3);
+    border-color: var(--primary);
+  }
+
+  .notes {
+    position: fixed;
+    bottom: 80px;
+    left: 28px;
+    max-width: 400px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: rgba(8, 8, 14, 0.95);
+    border: 1px solid rgba(255, 140, 26, 0.25);
+    backdrop-filter: blur(18px);
+    font-size: 12.5px;
+    color: #b9c4dd;
+    line-height: 1.8;
+    z-index: 900;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: 0.4s;
+    pointer-events: none;
+  }
+  .notes.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .notes b {
+    color: var(--primary);
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    font-family: 'JetBrains Mono';
+  }
+
+  .helper {
+    position: fixed;
+    top: 22px;
+    left: 28px;
+    font-family: 'JetBrains Mono';
+    font-size: 10px;
+    color: rgba(255, 140, 26, 0.4);
+    z-index: 900;
+    letter-spacing: 2px;
+  }
+
+  /* ============ LAYOUT HELPERS ============ */
+  .row { display: flex; gap: 20px; flex: 1; min-height: 0; }
+  .col { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+  .center-v { justify-content: center; }
+  .center-h { align-items: center; }
+
+  /* ============ KPI ============ */
+  .kpi {
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: rgba(255, 140, 26, 0.04);
+    border: 1px solid rgba(255, 140, 26, 0.18);
+    backdrop-filter: blur(14px);
+  }
+  .kpi .v {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.1;
+  }
+  .kpi .l {
+    font-size: 11.5px;
+    color: var(--text-mid);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* ============ FLOW ============ */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .flow.center { justify-content: center; }
+  .node {
+    padding: 11px 16px;
+    border-radius: 10px;
+    background: rgba(255, 140, 26, 0.05);
+    border: 1px solid rgba(255, 140, 26, 0.2);
+    font-weight: 600;
+    font-size: 12.5px;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+    transition: 0.3s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .node:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(255, 140, 26, 0.15);
+  }
+  .node.hl {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(255, 140, 26, 0.1);
+    box-shadow: 0 0 22px rgba(255, 140, 26, 0.15);
+  }
+  .node.danger {
+    border-color: var(--danger);
+    color: var(--danger);
+    background: rgba(255, 46, 77, 0.08);
+  }
+  .node.success {
+    border-color: var(--success);
+    color: var(--success);
+    background: rgba(0, 214, 143, 0.08);
+  }
+  .node.info {
+    border-color: var(--info);
+    color: var(--info);
+    background: rgba(0, 184, 255, 0.08);
+  }
+  .arrow { color: var(--primary); font-size: 16px; opacity: 0.7; }
+
+  /* ============ TABLES ============ */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 12.5px;
+    border: 1px solid rgba(255, 140, 26, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  th {
+    background: linear-gradient(180deg, rgba(20, 24, 36, 0.95), rgba(30, 36, 52, 0.95));
+    color: var(--primary);
+    padding: 11px 10px;
+    font-weight: 700;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 140, 26, 0.2);
+  }
+  td {
+    padding: 10px;
+    background: rgba(255, 140, 26, 0.02);
+    text-align: right;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(255, 140, 26, 0.08);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  tr:nth-child(even) td { background: rgba(255, 140, 26, 0.05); }
+  td.center { text-align: center; }
+  .check { color: var(--success); font-weight: 700; font-size: 15px; }
+  .cross { color: var(--danger); font-weight: 700; font-size: 15px; }
+
+  /* ============ CARDS ============ */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+    margin: 14px 0;
+  }
+  .card {
+    background: rgba(255, 140, 26, 0.04);
+    border: 1px solid rgba(255, 140, 26, 0.18);
+    border-radius: 14px;
+    padding: 16px 16px;
+    transition: 0.35s;
+    backdrop-filter: blur(12px);
+  }
+  .card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(255, 140, 26, 0.12);
+  }
+  .card .ic {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 140, 26, 0.2), rgba(255, 46, 77, 0.15));
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 140, 26, 0.2);
+  }
+  .card h4 {
+    font-size: 14.5px;
+    color: var(--text);
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .card p {
+    font-size: 11.5px;
+    color: var(--text-mid);
+    line-height: 1.65;
+  }
+
+  /* ============ COVER ============ */
+  .cover {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .cover-inner { position: relative; z-index: 3; }
+  .cover h1 {
+    font-size: clamp(40px, 6.5vw, 88px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin: 20px 0 10px;
+    background: linear-gradient(180deg, #ffffff 20%, #ff8c1a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 50px rgba(255, 140, 26, 0.4));
+  }
+  .cover h2 {
+    font-size: clamp(15px, 2vw, 22px);
+    color: var(--primary);
+    font-weight: 600;
+    letter-spacing: 4px;
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cover .ar-title {
+    font-size: clamp(22px, 3vw, 38px);
+    font-weight: 800;
+    color: var(--text);
+    margin-top: 22px;
+    letter-spacing: 1px;
+  }
+  .cover .tagline {
+    font-size: clamp(13px, 1.5vw, 17px);
+    color: var(--secondary);
+    max-width: 720px;
+    margin: 22px auto 0;
+    line-height: 1.9;
+    font-style: italic;
+    padding: 14px 28px;
+    border-top: 1px solid rgba(255, 214, 10, 0.3);
+    border-bottom: 1px solid rgba(255, 214, 10, 0.3);
+  }
+  .cover .info-box {
+    max-width: 720px;
+    margin: 32px auto 0;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 140, 26, 0.22);
+    backdrop-filter: blur(12px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    text-align: right;
+  }
+  .cover .info-item .lbl {
+    font-size: 10px;
+    color: var(--text-soft);
+    letter-spacing: 2px;
+    font-family: 'JetBrains Mono';
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .cover .info-item .val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ============ HELMET VISUAL ============ */
+  .helmet-visual {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 45px rgba(255, 140, 26, 0.4));
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* ============ SCENE DIAGRAM ============ */
+  .scene {
+    flex: 1;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255, 140, 26, 0.05), transparent 65%),
+      linear-gradient(160deg, rgba(20, 24, 36, 0.7), rgba(10, 12, 20, 0.7));
+    border: 1px solid rgba(255, 140, 26, 0.18);
+    position: relative;
+    overflow: hidden;
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .scene svg { width: 100%; height: 100%; max-height: 100%; }
+
+  /* ============ ALERT LEVELS ============ */
+  .alert-level {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border-right: 4px solid;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .alert-level.level-1 { border-right-color: var(--success); background: rgba(0, 214, 143, 0.05); }
+  .alert-level.level-2 { border-right-color: var(--secondary); background: rgba(255, 214, 10, 0.05); }
+  .alert-level.level-3 { border-right-color: var(--primary); background: rgba(255, 140, 26, 0.05); }
+  .alert-level.level-4 { border-right-color: var(--danger); background: rgba(255, 46, 77, 0.07); }
+  .alert-level .num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-family: 'JetBrains Mono';
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .alert-level.level-1 .num { background: rgba(0, 214, 143, 0.15); color: var(--success); }
+  .alert-level.level-2 .num { background: rgba(255, 214, 10, 0.15); color: var(--secondary); }
+  .alert-level.level-3 .num { background: rgba(255, 140, 26, 0.15); color: var(--primary); }
+  .alert-level.level-4 .num { background: rgba(255, 46, 77, 0.15); color: var(--danger); }
+  .alert-level .info { flex: 1; }
+  .alert-level .info h5 { font-size: 13.5px; font-weight: 700; margin-bottom: 3px; }
+  .alert-level .info p { font-size: 11.5px; color: var(--text-mid); line-height: 1.55; }
+
+  /* ============ END ============ */
+  .end { align-items: center; justify-content: center; text-align: center; }
+  .end h2 {
+    font-size: clamp(28px, 4vw, 54px);
+    font-weight: 800;
+    line-height: 1.3;
+    max-width: 1000px;
+    color: var(--text);
+  }
+  .end h2 .primary { color: var(--primary); }
+  .end .brand {
+    font-family: 'Space Grotesk';
+    font-size: clamp(32px, 5.5vw, 72px);
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin-top: 30px;
+    background: linear-gradient(180deg, #fff, #ff8c1a 50%, #ff2e4d 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 0 45px rgba(255, 140, 26, 0.4));
+  }
+  .end .tagline {
+    color: var(--primary);
+    font-size: 15px;
+    letter-spacing: 4px;
+    margin-top: 12px;
+    font-family: 'JetBrains Mono';
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    .slide { padding: 40px 40px 80px; }
+    .row { flex-direction: column; }
+  }
+  @media (max-width: 700px) {
+    .slide { padding: 30px 20px 80px; }
+    .slide-title { font-size: 22px; }
+    .cover h1 { font-size: 34px; }
+    .cover .info-box { grid-template-columns: 1fr; }
+    .nav { right: 10px; bottom: 10px; }
+    .nav button { width: 38px; height: 38px; }
+    .helper, .notes { display: none; }
+    .flow { gap: 6px; }
+    .node { font-size: 10.5px; padding: 8px 10px; }
+    table { font-size: 10.5px; }
+    td, th { padding: 7px 5px; font-size: 10.5px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .kpi .v { font-size: 20px; }
+  }
+
+  /* ============ PRINT ============ */
+  @page { size: A4 landscape; margin: 0; }
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body { overflow: visible !important; height: auto !important; }
+    .nav, .pager, .helper, .notes, .pdf-toolbar { display: none !important; }
+    #deck { height: auto !important; position: static !important; }
+    .slide {
+      position: relative !important; opacity: 1 !important; transform: none !important;
+      pointer-events: auto !important; page-break-after: always; break-after: page;
+      width: 297mm; height: 210mm; margin: 0; padding: 20mm 25mm !important;
+      display: flex !important;
+    }
+    .slide:last-child { page-break-after: auto; }
+  }
+
+  .pdf-toolbar {
+    position: fixed; top: 20px; left: 20px; z-index: 99999;
+  }
+  .pdf-toolbar button {
+    background: linear-gradient(135deg, #ff8c1a, #ff2e4d);
+    color: white; border: none; padding: 12px 24px; border-radius: 40px;
+    font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 0.9rem;
+    cursor: pointer; box-shadow: 0 8px 24px rgba(255, 140, 26, 0.4);
+    display: flex; align-items: center; gap: 10px; transition: 0.25s;
+  }
+  .pdf-toolbar button:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(255, 140, 26, 0.6); }
+</style>
+</head>
+<body>
+
+<div class="pdf-toolbar"><button onclick="window.print()">🖨️ طباعة / PDF</button></div>
+<div class="helper">SMARTGUARD HELMET · ◀ ▶ للتنقل · N للملاحظات</div>
+
+<div id="deck">
+
+  <!-- ============================================================
+       01 — COVER
+       ============================================================ -->
+  <section class="slide cover active" data-notes="ابدأ بسؤال: كم حادثاً وقع لأن أحداً لم يعلم في الوقت المناسب؟ SmartGuard Helmet ليس خوذة، بل شبكة أمان كاملة لكل عامل في الموقع.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>SMARTGUARD · v1.0</span></div>
+      <span>INDUSTRIAL SAFETY · IoT · AI</span>
+    </div>
+
+    <div class="cover-inner">
+      <!-- شعار: خوذة + موجات -->
+      <div class="helmet-visual">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="helmetGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ff8c1a" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#ff2e4d" stop-opacity="0.4"/>
+            </linearGradient>
+            <linearGradient id="wavesGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00d68f"/>
+              <stop offset="100%" stop-color="#00b8ff"/>
+            </linearGradient>
+          </defs>
+
+          <!-- هالة -->
+          <circle cx="100" cy="100" r="85" fill="#ff8c1a" opacity="0.08"/>
+
+          <!-- الخوذة -->
+          <path d="M 40 120 Q 40 55 100 45 Q 160 55 160 120 L 165 135 L 35 135 Z"
+                fill="url(#helmetGrad)" stroke="#ff8c1a" stroke-width="2"/>
+          <!-- حافة الحماية -->
+          <path d="M 30 135 L 170 135 L 165 145 L 35 145 Z"
+                fill="#ff2e4d" opacity="0.5" stroke="#ff8c1a" stroke-width="1"/>
+          <!-- وحدة إلكترونية أمامية -->
+          <rect x="85" y="60" width="30" height="20" rx="3" fill="#0a0a0f" stroke="#00d68f" stroke-width="1.5"/>
+          <circle cx="100" cy="70" r="4" fill="#00d68f"/>
+          <circle cx="100" cy="70" r="8" fill="#00d68f" opacity="0.3"/>
+          <!-- حساسات -->
+          <circle cx="55" cy="95" r="3" fill="#00b8ff"/>
+          <circle cx="145" cy="95" r="3" fill="#00b8ff"/>
+          <circle cx="100" cy="105" r="2.5" fill="#ffd60a"/>
+          <!-- موجات لاسلكية -->
+          <path d="M 165 60 Q 175 55 185 60" stroke="url(#wavesGrad)" stroke-width="2" fill="none" opacity="0.8"/>
+          <path d="M 165 70 Q 178 63 190 70" stroke="url(#wavesGrad)" stroke-width="1.5" fill="none" opacity="0.6"/>
+          <path d="M 165 80 Q 180 71 195 80" stroke="url(#wavesGrad)" stroke-width="1" fill="none" opacity="0.4"/>
+          <!-- أزرار SOS -->
+          <circle cx="60" cy="55" r="5" fill="#ff2e4d" opacity="0.8"/>
+          <text x="60" y="59" text-anchor="middle" font-size="5" fill="white" font-weight="700">SOS</text>
+          <!-- نجمة تحذير -->
+          <path d="M 140 55 L 145 65 L 135 65 Z" fill="#ffd60a"/>
+          <text x="140" y="63" text-anchor="middle" font-size="6" fill="#0a0a0f" font-weight="700">!</text>
+        </svg>
+      </div>
+
+      <h1>SMARTGUARD</h1>
+      <h2>SMART SAFETY HELMET · IoT NETWORK · AI MONITORING</h2>
+
+      <div class="ar-title">الخوذة الذكية لحماية العمال في المواقع الصناعية</div>
+
+      <div class="tagline">
+        «لا تنتظر الحادث ليحدث… امنعه قبل أن يقع.»
+      </div>
+
+      <div class="info-box">
+        <div class="info-item">
+          <div class="lbl">Category</div>
+          <div class="val">Industrial Safety · IoT · AI</div>
+        </div>
+        <div class="info-item">
+          <div class="lbl">Target Market</div>
+          <div class="val">البناء · المصانع · البترول · التعدين</div>
+        </div>
+        <div class="info-item">
+          <div class="lbl">Made In</div>
+          <div class="val">المملكة العربية السعودية</div>
+        </div>
+        <div class="info-item">
+          <div class="lbl">Vision</div>
+          <div class="val">Saudi Vision 2030 · Safety Tech</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       02 — PROBLEM
+       ============================================================ -->
+  <section class="slide" data-notes="أرقام الحوادث الصناعية مؤلمة. أكثر من نصف الوفيات كان يمكن تجنبها لو كان هناك اكتشاف فوري وإبلاغ سريع.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>PROBLEM · 02</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 01 · THE PROBLEM</span>
+    <h2 class="slide-title">مشكلة حقيقية <span class="danger">تُكلّف أرواحاً سنوياً</span></h2>
+    <p class="slide-sub">في مواقع البناء والمصانع، يموت آلاف العمال سنوياً بسبب تأخر الاستجابة للحوادث. الخوذة التقليدية تحمي الرأس فقط، لكنها لا ترى، لا تسمع، لا تتصل، ولا تنقذ.</p>
+
+    <div class="cards-grid" style="margin-top: 22px;">
+      <div class="card">
+        <div class="ic">⏱️</div>
+        <h4>تأخر الاستجابة</h4>
+        <p>في كثير من الحوادث، لا يُعلم بوقوع العامل المصاب إلا بعد دقائق طويلة — وقد تكون تلك الدقائق حاسمة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🔇</div>
+        <h4>عدم التواصل</h4>
+        <p>عامل يسقط في منطقة نائية أو خلف جدار؟ لا أحد يعلم. ولا يستطيع هو نفسه طلب المساعدة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📍</div>
+        <h4>لا يوجد موقع دقيق</h4>
+        <p>عند وقوع الحادث، لا يعرف المشرف مكان العامل المصاب بدقة. تأخير الإنقاذ = تأخير الإنعاش.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📹</div>
+        <h4>لا يوجد دليل</h4>
+        <p>بعد الحادث، لا يوجد تسجيل يوضح ما حدث. السبب الحقيقي يبقى مجهولاً، والدرس لا يُتَعلم.</p>
+      </div>
+      <div class="card">
+        <div class="ic">⚠️</div>
+        <h4>الخطر الصامت</h4>
+        <p>الحرارة المرتفعة، الغازات، الأجسام الساقطة — كل هذه لا تُكتَشف إلا بعد فوات الأوان.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📊</div>
+        <h4>لا توجد بيانات</h4>
+        <p>لا أحد يعرف كم حادثاً كاد أن يقع. لأن هذه "الحوادث الوشيكة" غير مسجلة، ولا تحليل، ولا تحسين.</p>
+      </div>
+    </div>
+
+    <div class="glass" style="margin-top: 20px;">
+      <div style="font-size: 15px; line-height: 1.8; color: #d0d8ec;">
+        <strong style="color: var(--danger);">الحقيقة المؤلمة:</strong> الخوذة التقليدية تحمي الرأس من الصدمة المباشرة، لكنها لا تحمي العامل من <strong style="color: var(--text);">الوحدة، من التأخر، من الجهل بمحيطه</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       03 — SOLUTION
+       ============================================================ -->
+  <section class="slide" data-notes="SmartGuard Helmet يجمع كل شيء في خوذة واحدة: حساسات، كاميرا، اتصال، ذكاء اصطناعي. تبقى خوذة عادية من الخارج، لكنها تحمي من الداخل بشكل مختلف.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>SOLUTION · 03</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 02 · THE SOLUTION</span>
+    <h2 class="slide-title">خوذة تفكر. ترى. تتصل. <span class="success">تُنقذ.</span></h2>
+    <p class="slide-sub">SmartGuard Helmet هي شبكة أمان كاملة مدمجة في خوذة السلامة التقليدية. تكتشف الحوادث في لحظتها، تبث المعلومة لكل من يحتاجها، وتضع العامل في قلب شبكة تحميه.</p>
+
+    <div class="row" style="margin-top: 22px;">
+      <div class="col">
+        <div class="kpi"><div class="v">10+ Sensors</div><div class="l">حساسات مدمجة للموقع والحركة والبيئة</div></div>
+        <div class="kpi"><div class="v">Mesh Network</div><div class="l">شبكة لاسلكية محلية بين جميع الخوذ</div></div>
+        <div class="kpi"><div class="v">4 Alert Levels</div><div class="l">تنبيه متدرج حسب خطورة الحادث</div></div>
+      </div>
+      <div class="col">
+        <div class="kpi"><div class="v">Real-time Camera</div><div class="l">تسجيل ذكي يبدأ تلقائياً عند الحادث</div></div>
+        <div class="kpi"><div class="v">AI Detection</div><div class="l">تحليل ذكي يميز الحوادث من الحركات العادية</div></div>
+        <div class="kpi"><div class="v">Central Dashboard</div><div class="l">مركز تحكم لمراقبة كل العمال لحظياً</div></div>
+      </div>
+    </div>
+
+    <div class="glass" style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: center;">
+      <span class="node success">🛡️ حماية استباقية</span>
+      <span class="node success">⚡ استجابة فورية</span>
+      <span class="node success">📡 اتصال لاسلكي</span>
+      <span class="node success">🎥 توثيق كامل</span>
+      <span class="node success">🤖 ذكاء اصطناعي</span>
+      <span class="node success">📍 تحديد موقع دقيق</span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       04 — HOW IT WORKS
+       ============================================================ -->
+  <section class="slide" data-notes="اشرح الرحلة الكاملة من لحظة الحادث إلى وصول الإنقاذ. كل خطوة مُصممة لتقليل الزمن وتقليل الأخطاء.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>HOW IT WORKS · 04</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 03 · HOW IT WORKS</span>
+    <h2 class="slide-title">من لحظة السقوط إلى <span class="ac">لحظة الإنقاذ</span></h2>
+
+    <div class="scene" style="margin-top: 18px; min-height: 280px;">
+      <svg viewBox="0 0 900 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="alertGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff2e4d" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#ff2e4d" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- الخط الزمني -->
+        <line x1="60" y1="130" x2="840" y2="130" stroke="#ff8c1a" stroke-width="2" stroke-dasharray="4 4" opacity="0.4"/>
+
+        <!-- 1. الحادث -->
+        <g transform="translate(110, 130)">
+          <circle r="50" fill="url(#alertGlow)"/>
+          <circle r="35" fill="#151824" stroke="#ff2e4d" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-family="Space Grotesk" font-size="24" fill="#ff2e4d">⚠</text>
+          <text y="65" text-anchor="middle" font-family="Cairo" font-size="11" fill="#ff2e4d" font-weight="700">حادث يقع</text>
+        </g>
+
+        <!-- السهم 1 -->
+        <path d="M 165 130 L 195 130" stroke="#ff8c1a" stroke-width="2"/>
+        <path d="M 190 125 L 197 130 L 190 135" fill="#ff8c1a"/>
+
+        <!-- 2. الكشف -->
+        <g transform="translate(250, 130)">
+          <circle r="35" fill="#151824" stroke="#ff8c1a" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-family="Space Grotesk" font-size="20" fill="#ff8c1a">📡</text>
+          <text y="65" text-anchor="middle" font-family="Cairo" font-size="11" fill="#ff8c1a" font-weight="700">الكشف الفوري</text>
+        </g>
+
+        <path d="M 305 130 L 335 130" stroke="#ff8c1a" stroke-width="2"/>
+        <path d="M 330 125 L 337 130 L 330 135" fill="#ff8c1a"/>
+
+        <!-- 3. التأكيد -->
+        <g transform="translate(390, 130)">
+          <circle r="35" fill="#151824" stroke="#00b8ff" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-family="Space Grotesk" font-size="20" fill="#00b8ff">🤖</text>
+          <text y="65" text-anchor="middle" font-family="Cairo" font-size="11" fill="#00b8ff" font-weight="700">تأكيد AI</text>
+        </g>
+
+        <path d="M 445 130 L 475 130" stroke="#00b8ff" stroke-width="2"/>
+        <path d="M 470 125 L 477 130 L 470 135" fill="#00b8ff"/>
+
+        <!-- 4. الشبكة -->
+        <g transform="translate(530, 130)">
+          <circle r="35" fill="#151824" stroke="#ffd60a" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-family="Space Grotesk" font-size="20" fill="#ffd60a">🔗</text>
+          <text y="65" text-anchor="middle" font-family="Cairo" font-size="11" fill="#ffd60a" font-weight="700">بث للشبكة</text>
+        </g>
+
+        <path d="M 585 130 L 615 130" stroke="#ffd60a" stroke-width="2"/>
+        <path d="M 610 125 L 617 130 L 610 135" fill="#ffd60a"/>
+
+        <!-- 5. التحذير -->
+        <g transform="translate(670, 130)">
+          <circle r="35" fill="#151824" stroke="#ff8c1a" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-family="Space Grotesk" font-size="20" fill="#ff8c1a">📢</text>
+          <text y="65" text-anchor="middle" font-family="Cairo" font-size="11" fill="#ff8c1a" font-weight="700">تحذير العمال</text>
+        </g>
+
+        <path d="M 725 130 L 755 130" stroke="#00d68f" stroke-width="2"/>
+        <path d="M 750 125 L 757 130 L 750 135" fill="#00d68f"/>
+
+        <!-- 6. الاستجابة -->
+        <g transform="translate(810, 130)">
+          <circle r="35" fill="#151824" stroke="#00d68f" stroke-width="2"/>
+          <text y="4" text-anchor="middle" font-family="Space Grotesk" font-size="20" fill="#00d68f">🚑</text>
+          <text y="65" text-anchor="middle" font-family="Cairo" font-size="11" fill="#00d68f" font-weight="700">وصول الإنقاذ</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="flow center" style="margin-top: 12px;">
+      <span class="node danger">⚠️ حادث</span>
+      <span class="arrow">→</span>
+      <span class="node hl">📡 كشف</span>
+      <span class="arrow">→</span>
+      <span class="node info">🤖 تأكيد AI</span>
+      <span class="arrow">→</span>
+      <span class="node gold">🔗 بث للشبكة</span>
+      <span class="arrow">→</span>
+      <span class="node hl">📢 تحذير</span>
+      <span class="arrow">→</span>
+      <span class="node success">🚑 إنقاذ</span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       05 — HELMET COMPONENTS
+       ============================================================ -->
+  <section class="slide" data-notes="كل مكون له دور. لا شيء زائد، ولا شيء ناقص. الفكرة أن تبقى الخوذة خفيفة ومريحة كالخوذة التقليدية.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>COMPONENTS · 05</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 04 · COMPONENTS</span>
+    <h2 class="slide-title">مكونات الخوذة — <span class="ac">قلب النظام</span></h2>
+
+    <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 22px;">
+      <div class="card">
+        <div class="ic">🧠</div>
+        <h4>وحدة التحكم المركزية</h4>
+        <p>معالج قوي مدمج يعالج كل الإشارات فورياً ويتخذ قرارات الطوارئ محلياً.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📐</div>
+        <h4>حساس التسارع والحركة</h4>
+        <p>يكتشف السقوط الحر، الضربات القوية، والحركات غير الطبيعية.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🧭</div>
+        <h4>حساس الميلان (Gyro)</h4>
+        <p>يقيس زاوية الرأس ووضعيته. يكشف إذا مال العامل بشكل خطر أو سقط أرضاً.</p>
+      </div>
+      <div class="card">
+        <div class="ic">💥</div>
+        <h4>حساس الصدمة</h4>
+        <p>يكتشف الارتطامات القوية بخوذة العامل (أجسام ساقطة، معدات، حائط).</p>
+      </div>
+      <div class="card">
+        <div class="ic">🌡️</div>
+        <h4>حساس الحرارة</h4>
+        <p>يقيس حرارة العامل وحرارة البيئة. ينبه في حالة الإجهاد الحراري أو الحريق.</p>
+      </div>
+      <div class="card">
+        <div class="ic">💨</div>
+        <h4>حساس الغاز والدخان</h4>
+        <p>اختياري حسب الموقع. يحذر من تسرب غاز سام أو أبخرة خطرة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📷</div>
+        <h4>كاميرا مدمجة</h4>
+        <p>تسجيل ذكي للحظات الحرجة — قبل وأثناء وبعد الحادث. ليس مراقبة مستمرة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🔊</div>
+        <h4>سماعة + هزاز</h4>
+        <p>تنبيه صوتي واهتزازي داخل الخوذة عند اكتشاف خطر — لا يفوت العامل.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🆘</div>
+        <h4>زر SOS</h4>
+        <p>زر يدوي بسيط يضغطه العامل عند الحاجة. يعمل حتى لو فقد الوعي جزئياً.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🔋</div>
+        <h4>بطارية قابلة للاستبدال</h4>
+        <p>تدوم 12+ ساعة. تُستبدل بسهولة. تُشحن في محطة مركزية.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📡</div>
+        <h4>وحدة اتصال لاسلكي</h4>
+        <p>Mesh Network بين كل الخوذ + اتصال بمركز التحكم عبر Gateway.</p>
+      </div>
+      <div class="card">
+        <div class="ic">💡</div>
+        <h4>مؤشرات LED</h4>
+        <p>دائرة ضوئية تعرض حالة الخوذة، مستوى البطارية، وجود خطر — كل ذلك بألوان واضحة.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       06 — MESH NETWORK
+       ============================================================ -->
+  <section class="slide" data-notes="الشبكة هي العمود الفقري للنظام. كل خوذة نقطة اتصال. إذا سقط أحد، الكل يعلم فوراً.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>NETWORK · 06</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 05 · MESH NETWORK</span>
+    <h2 class="slide-title">شبكة العمال — <span class="ac">كل خوذة نقطة اتصال</span></h2>
+    <p class="slide-sub">لا Bluetooth بين خوذتين فقط. بل شبكة Mesh كاملة. كل خوذة تتحدث مع من حولها، وتنقل الرسائل للخوذ الأبعد. حادث عند العامل رقم 07؟ كل الموقع يعلم في أقل من ثانية.</p>
+
+    <div class="scene" style="margin-top: 22px; min-height: 320px;">
+      <svg viewBox="0 0 800 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="hubGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#00b8ff" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#00b8ff" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="workerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#00d68f" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#00d68f" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="dangerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ff2e4d" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#ff2e4d" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- خطوط الاتصال -->
+        <g stroke="#00b8ff" stroke-width="0.7" opacity="0.3" fill="none">
+          <line x1="400" y1="150" x2="150" y2="80"/>
+          <line x1="400" y1="150" x2="650" y2="80"/>
+          <line x1="400" y1="150" x2="150" y2="220"/>
+          <line x1="400" y1="150" x2="650" y2="220"/>
+          <line x1="400" y1="150" x2="400" y2="40"/>
+          <line x1="400" y1="150" x2="400" y2="260"/>
+          <line x1="150" y1="80" x2="650" y2="80"/>
+          <line x1="150" y1="220" x2="650" y2="220"/>
+          <line x1="150" y1="80" x2="150" y2="220"/>
+          <line x1="650" y1="80" x2="650" y2="220"/>
+        </g>
+
+        <!-- Gateway المركز -->
+        <g transform="translate(400, 150)">
+          <circle r="60" fill="url(#hubGlow)"/>
+          <circle r="38" fill="#0f1118" stroke="#00b8ff" stroke-width="2"/>
+          <text y="-2" text-anchor="middle" font-family="Space Grotesk" font-size="9" fill="#00b8ff" letter-spacing="2">CONTROL</text>
+          <text y="12" text-anchor="middle" font-family="Space Grotesk" font-size="11" fill="#00b8ff" font-weight="700">GATEWAY</text>
+        </g>
+
+        <!-- عامل 01 (علوي - سليم) -->
+        <g transform="translate(400, 40)">
+          <circle r="30" fill="url(#workerGlow)"/>
+          <circle r="18" fill="#0f1118" stroke="#00d68f" stroke-width="1.8"/>
+          <text y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#00d68f">01</text>
+        </g>
+
+        <!-- عامل 02 (يسار علوي) -->
+        <g transform="translate(150, 80)">
+          <circle r="30" fill="url(#workerGlow)"/>
+          <circle r="18" fill="#0f1118" stroke="#00d68f" stroke-width="1.8"/>
+          <text y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#00d68f">02</text>
+        </g>
+
+        <!-- عامل 03 (يمين علوي) -->
+        <g transform="translate(650, 80)">
+          <circle r="30" fill="url(#workerGlow)"/>
+          <circle r="18" fill="#0f1118" stroke="#00d68f" stroke-width="1.8"/>
+          <text y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#00d68f">03</text>
+        </g>
+
+        <!-- عامل 04 (يسار سفلي) -->
+        <g transform="translate(150, 220)">
+          <circle r="30" fill="url(#workerGlow)"/>
+          <circle r="18" fill="#0f1118" stroke="#00d68f" stroke-width="1.8"/>
+          <text y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#00d68f">04</text>
+        </g>
+
+        <!-- عامل 05 (يمين سفلي) -->
+        <g transform="translate(650, 220)">
+          <circle r="30" fill="url(#workerGlow)"/>
+          <circle r="18" fill="#0f1118" stroke="#00d68f" stroke-width="1.8"/>
+          <text y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#00d68f">05</text>
+        </g>
+
+        <!-- عامل 07 (تحت - في خطر) -->
+        <g transform="translate(400, 260)">
+          <circle r="50" fill="url(#dangerGlow)"/>
+          <circle r="18" fill="#0f1118" stroke="#ff2e4d" stroke-width="2.5">
+            <animate attributeName="stroke-opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <text y="3" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#ff2e4d" font-weight="700">07</text>
+          <text y="35" text-anchor="middle" font-family="Cairo" font-size="10" fill="#ff2e4d" font-weight="700">⚠️ في خطر</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="glass" style="margin-top: 16px; text-align: center;">
+      <div style="font-size: 13.5px; color: #d0d8ec; line-height: 1.9;">
+        كل خوذة تنقل الرسالة للخوذ القريبة → التي تنقلها للخوذ الأبعد → حتى تصل للـ <strong style="color: var(--info);">Gateway</strong> → التي ترسلها فوراً لـ <strong style="color: var(--primary);">مركز التحكم</strong>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       07 — ALERT LEVELS
+       ============================================================ -->
+  <section class="slide" data-notes="التنبيه الذكي متعدد المستويات. حادث بسيط؟ تنبيه داخلي. حادث خطير؟ إطلاق طوارئ كاملة.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>ALERTS · 07</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 06 · ALERT LEVELS</span>
+    <h2 class="slide-title">أربعة مستويات <span class="ac">من التنبيه الذكي</span></h2>
+
+    <div style="margin-top: 24px;">
+      <div class="alert-level level-1">
+        <div class="num">01</div>
+        <div class="info">
+          <h5>المستوى الأول — تنبيه العامل نفسه</h5>
+          <p>اهتزاز خفيف + صوت خفيف داخل الخوذة. يحدث عند: ميلان غير طبيعي، اقتراب من منطقة خطرة، ارتفاع حرارة معتدل.</p>
+        </div>
+      </div>
+
+      <div class="alert-level level-2">
+        <div class="num">02</div>
+        <div class="info">
+          <h5>المستوى الثاني — تحذير العمال القريبين</h5>
+          <p>نبضة صوتية في الخوذ المجاورة (نطاق 20 متراً). تنبيه لفظي: "احذر، خطر قريب".</p>
+        </div>
+      </div>
+
+      <div class="alert-level level-3">
+        <div class="num">03</div>
+        <div class="info">
+          <h5>المستوى الثالث — إبلاغ المشرف</h5>
+          <p>إشعار فوري على لوحة المشرف + تحديد موقع العامل على الخريطة + إرسال بيانات الحساسات + فيديو أولي إن أمكن.</p>
+        </div>
+      </div>
+
+      <div class="alert-level level-4">
+        <div class="num">04</div>
+        <div class="info">
+          <h5>المستوى الرابع — طوارئ كاملة</h5>
+          <p>إشعار أحمر لمـركز التحكم + إطلاق صوت إنذار في الموقع + بدء تسجيل الفيديو + إرسال موقع العامل الدقيق + إشعار فرق الإسعاف والإنقاذ + إطلاق سيناريو الاستجابة الكامل.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass" style="margin-top: 20px; text-align: center;">
+      <div style="font-size: 13.5px; color: #d0d8ec;">
+        <strong style="color: var(--primary);">التمييز الذكي:</strong> النظام لا يطلق إنذاراً كاملاً عند كل حركة. الذكاء الاصطناعي يفرق بين الحركات الطبيعية والحوادث الحقيقية لتقليل الإنذارات الكاذبة.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       08 — SENSORS FUSION
+       ============================================================ -->
+  <section class="slide" data-notes="الذكاء الحقيقي هو في دمج الحساسات. لا واحد يعطي القرار، بل الجميع معاً. هذا يقلل الإنذارات الكاذبة إلى أقل من 1%.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>SENSOR FUSION · 08</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 07 · SENSOR FUSION</span>
+    <h2 class="slide-title">لا حساس واحد يكفي — <span class="ac">الدمج هو الذكاء</span></h2>
+
+    <div class="row" style="margin-top: 24px;">
+      <div class="col">
+        <div class="glass">
+          <h4 style="color: var(--danger); margin-bottom: 8px;">❌ الطريقة التقليدية</h4>
+          <p style="color: var(--text-mid); font-size: 12.5px; line-height: 1.7;">
+            حساس واحد يكتشف → إطلاق إنذار. النتيجة: إنذارات كاذبة كثيرة، العمال يفقدون الثقة، المشرف يتجاهل التنبيهات.
+          </p>
+        </div>
+        <div class="glass" style="border-color: rgba(0, 214, 143, 0.3);">
+          <h4 style="color: var(--success); margin-bottom: 8px;">✅ طريقة SmartGuard</h4>
+          <p style="color: var(--text-mid); font-size: 12.5px; line-height: 1.7;">
+            عدة حساسات تقرأ معاً → الذكاء الاصطناعي يحلل → القرار النهائي بعد التأكد. النتيجة: دقة عالية، إنذارات كاذبة أقل من 1%.
+          </p>
+        </div>
+      </div>
+      <div class="col">
+        <div class="glass" style="flex: 1;">
+          <h4 style="color: var(--primary); margin-bottom: 12px;">مثال عملي: سقوط عامل</h4>
+          <div class="flow" style="gap: 8px; flex-direction: column; align-items: stretch;">
+            <span class="node" style="text-align: center;">📐 التسارع يقفز فجأة</span>
+            <span class="arrow" style="text-align: center;">↓</span>
+            <span class="node" style="text-align: center;">🧭 الميلان يتغير لأكثر من 90°</span>
+            <span class="arrow" style="text-align: center;">↓</span>
+            <span class="node" style="text-align: center;">💥 حساس الصدمة يكشف الارتطام</span>
+            <span class="arrow" style="text-align: center;">↓</span>
+            <span class="node" style="text-align: center;">⏸️ لا حركة لعدة ثوانٍ</span>
+            <span class="arrow" style="text-align: center;">↓</span>
+            <span class="node danger" style="text-align: center;">🚨 حادث مؤكد → طوارئ كاملة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       09 — CAMERA INTELLIGENCE
+       ============================================================ -->
+  <section class="slide" data-notes="الكاميرا ليست للمراقبة. هي للتوثيق عند الحادث فقط. تخزن آخر 10 ثوان دائرياً، وعند الحادث تحفظ اللحظة قبل وأثناء وبعد.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>CAMERA · 09</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 08 · SMART CAMERA</span>
+    <h2 class="slide-title">كاميرا ذكية — <span class="ac">توثق ولا تراقب</span></h2>
+
+    <div class="cards-grid" style="margin-top: 22px;">
+      <div class="card">
+        <div class="ic">🔄</div>
+        <h4>تخزين دائري دائم</h4>
+        <p>الخوذة تحتفظ بآخر 10 ثوانٍ فقط في الذاكرة الدائرية. لا تسجيل مستمر، لا خصوصية منتهكة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">⚡</div>
+        <h4>تفعيل تلقائي عند الحادث</h4>
+        <p>عند الكشف عن حادث حقيقي، يتم تجميد الـ 10 ثوانٍ السابقة + تسجيل 30 ثانية بعد الحادث.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🏷️</div>
+        <h4>ربط كامل بالحادث</h4>
+        <p>الفيديو يرتبط تلقائياً بـ: رقم العامل، الموقع، الوقت الدقيق، نوع الحادث، مستوى الخطورة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🔍</div>
+        <h4>مصدر لا يقدر بثمن للتحقيق</h4>
+        <p>بعد الحادث، تعرف بالضبط: ما الذي حدث؟ لماذا؟ من المسؤول؟ كيف نمنع تكراره؟</p>
+      </div>
+    </div>
+
+    <div class="scene" style="margin-top: 22px; min-height: 200px;">
+      <svg viewBox="0 0 800 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- الشريط الزمني -->
+        <rect x="60" y="70" width="680" height="40" rx="20" fill="#151824" stroke="#232838"/>
+
+        <!-- التسجيل قبل الحادث (10 ثواني) -->
+        <rect x="60" y="70" width="150" height="40" rx="20" fill="#ffd60a" opacity="0.15"/>
+        <text x="135" y="95" text-anchor="middle" font-family="Cairo" font-size="12" fill="#ffd60a" font-weight="700">آخر 10 ثوان</text>
+
+        <!-- لحظة الحادث -->
+        <rect x="210" y="70" width="120" height="40" fill="#ff2e4d" opacity="0.35"/>
+        <text x="270" y="95" text-anchor="middle" font-family="Cairo" font-size="12" fill="#ff2e4d" font-weight="700">⚠️ الحادث</text>
+
+        <!-- التسجيل بعد الحادث (30 ثانية) -->
+        <rect x="330" y="70" width="410" height="40" rx="20" fill="#00d68f" opacity="0.15"/>
+        <text x="535" y="95" text-anchor="middle" font-family="Cairo" font-size="12" fill="#00d68f" font-weight="700">30 ثانية بعد الحادث</text>
+
+        <!-- علامة التوقف -->
+        <circle cx="740" cy="90" r="14" fill="#ff2e4d"/>
+        <rect x="735" y="85" width="10" height="10" fill="white"/>
+
+        <!-- علامة البداية -->
+        <circle cx="60" cy="90" r="14" fill="#0f1118" stroke="#ffd60a" stroke-width="2"/>
+        <text x="60" y="95" text-anchor="middle" font-family="Space Grotesk" font-size="10" fill="#ffd60a">▶</text>
+
+        <!-- Captions -->
+        <text x="400" y="40" text-anchor="middle" font-family="Cairo" font-size="11" fill="#a5b0cc">الشريط الزمني للتسجيل الذكي</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       10 — FALLING OBJECT DETECTION
+       ============================================================ -->
+  <section class="slide" data-notes="الميزة الأكثر تميزاً. النظام لا يكتفي باكتشاف السقوط، بل يستجيب للأجسام الساقطة من الأعلى.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>FALLING OBJECTS · 10</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 09 · FALLING OBJECT DETECTION</span>
+    <h2 class="slide-title">اكتشاف <span class="danger">سقوط الأجسام من الأعلى</span></h2>
+    <p class="slide-sub">أحد أكثر الحوادث المميتة في مواقع البناء: سقوط مسمار، طوبة، أو أداة من طابق أعلى. SmartGuard Helmet يحوّل هذه اللحظة من كارثة محققة إلى إنقاذ فوري.</p>
+
+    <div class="scene" style="margin-top: 20px; min-height: 260px;">
+      <svg viewBox="0 0 800 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- مبنى -->
+        <rect x="80" y="20" width="140" height="180" stroke="#232838" stroke-width="2" fill="none"/>
+        <line x1="80" y1="60" x2="220" y2="60" stroke="#232838" stroke-width="1" opacity="0.5"/>
+        <line x1="80" y1="100" x2="220" y2="100" stroke="#232838" stroke-width="1" opacity="0.5"/>
+        <line x1="80" y1="140" x2="220" y2="140" stroke="#232838" stroke-width="1" opacity="0.5"/>
+        <line x1="150" y1="20" x2="150" y2="200" stroke="#232838" stroke-width="1" opacity="0.5"/>
+
+        <!-- جسم ساقط -->
+        <g>
+          <rect x="150" y="30" width="12" height="12" fill="#ff2e4d"/>
+          <animate attributeName="y" from="30" to="180" dur="1.5s" repeatCount="indefinite" fill="freeze"/>
+        </g>
+        <path d="M 156 30 L 156 60" stroke="#ff2e4d" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+
+        <!-- عامل -->
+        <g transform="translate(300, 160)">
+          <!-- جسم العامل -->
+          <circle cx="0" cy="-30" r="18" fill="#0f1118" stroke="#00d68f" stroke-width="2"/>
+          <path d="M -20 -12 Q -25 30 -22 70 L 22 70 Q 25 30 20 -12 Q 10 -20 0 -20 Q -10 -20 -20 -12 Z"
+                fill="#0f1118" stroke="#00d68f" stroke-width="2"/>
+          <!-- الخوذة -->
+          <path d="M -22 -38 Q -22 -58 0 -62 Q 22 -58 22 -38 L 24 -30 L -24 -30 Z"
+                fill="#ff8c1a" opacity="0.7" stroke="#ff8c1a" stroke-width="1.5"/>
+          <!-- موجات التنبيه -->
+          <circle cx="0" cy="-45" r="40" fill="none" stroke="#ff2e4d" stroke-width="1.5" opacity="0.6">
+            <animate attributeName="r" from="30" to="60" dur="1s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" from="0.7" to="0" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="-45" r="40" fill="none" stroke="#ff2e4d" stroke-width="1.5" opacity="0.6">
+            <animate attributeName="r" from="30" to="60" dur="1s" begin="0.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" from="0.7" to="0" dur="1s" begin="0.5s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+
+        <!-- رسالة التنبيه -->
+        <g transform="translate(500, 120)">
+          <rect x="0" y="0" width="260" height="80" rx="12" fill="#0f1118" stroke="#ff2e4d" stroke-width="2"/>
+          <text x="130" y="25" text-anchor="middle" font-family="Cairo" font-size="12" fill="#ff2e4d" font-weight="700">⚠️ كشف صدمة على الخوذة</text>
+          <text x="130" y="45" text-anchor="middle" font-family="Cairo" font-size="11" fill="#ff8c1a">العامل 07 · المنطقة B3</text>
+          <text x="130" y="63" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#00d68f">14:32:08 · مؤكد ✓</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="glass" style="margin-top: 16px;">
+      <div style="font-size: 13px; color: #d0d8ec; line-height: 1.9;">
+        <strong style="color: var(--primary);">في المستقبل:</strong> يمكن إضافة رادار قصير المدى أو حساسات بصرية لالتقاط الأجسام الساقطة <em>قبل</em> وصولها للعامل، مما يتيح للعامل وقتاً للتحرك بعيداً.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       11 — LOCATION TRACKING
+       ============================================================ -->
+  <section class="slide" data-notes="لا يمكن إنقاذ شخص لا تعرف مكانه. تحديد الموقع ليس كماليات، بل شرط أساسي.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>LOCATION · 11</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 10 · LOCATION TRACKING</span>
+    <h2 class="slide-title">تحديد موقع كل عامل — <span class="ac">بدقة داخل وخارج الموقع</span></h2>
+
+    <div class="row" style="margin-top: 22px;">
+      <div class="col">
+        <div class="glass">
+          <h4 style="color: var(--info); margin-bottom: 10px;">🌍 للاستخدام الخارجي</h4>
+          <p style="color: var(--text-mid); font-size: 12.5px; line-height: 1.7; margin-bottom: 12px;">
+            <strong style="color: var(--text);">GPS + GNSS</strong> — دقة 3-5 أمتار في الهواء الطلق.
+          </p>
+          <ul style="color: var(--text-mid); font-size: 12px; padding-right: 20px; line-height: 1.9;">
+            <li>مناسب لمواقع البناء المفتوحة</li>
+            <li>يعمل عبر الأقمار الصناعية</li>
+            <li>يحتاج خط نظر مباشر مع السماء</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col">
+        <div class="glass" style="border-color: rgba(0, 214, 143, 0.3);">
+          <h4 style="color: var(--success); margin-bottom: 10px;">🏭 للاستخدام الداخلي</h4>
+          <p style="color: var(--text-mid); font-size: 12.5px; line-height: 1.7; margin-bottom: 12px;">
+            <strong style="color: var(--text);">UWB (Ultra-Wideband)</strong> — دقة 10-30 سنتيمتر داخل المباني.
+          </p>
+          <ul style="color: var(--text-mid); font-size: 12px; padding-right: 20px; line-height: 1.9;">
+            <li>يعمل داخل الأنفاق والمصانع</li>
+            <li>لا يحتاج أقماراً صناعية</li>
+            <li>دقة أعلى بكثير من GPS</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass" style="margin-top: 20px;">
+      <h4 style="color: var(--primary); margin-bottom: 12px;">🎯 ما يعرفه النظام عن كل عامل:</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <div style="padding: 10px 14px; background: rgba(255,140,26,0.05); border-radius: 8px; font-size: 12.5px;">📍 موقعه الحالي على الخريطة</div>
+        <div style="padding: 10px 14px; background: rgba(255,140,26,0.05); border-radius: 8px; font-size: 12.5px;">🚶 اتجاه حركته وسرعته</div>
+        <div style="padding: 10px 14px; background: rgba(255,140,26,0.05); border-radius: 8px; font-size: 12.5px;">👥 العمال القريبون منه</div>
+        <div style="padding: 10px 14px; background: rgba(255,140,26,0.05); border-radius: 8px; font-size: 12.5px;">⏱️ آخر تحديث للموقع</div>
+        <div style="padding: 10px 14px; background: rgba(255,140,26,0.05); border-radius: 8px; font-size: 12.5px;">🚨 هل هو في منطقة خطرة؟</div>
+        <div style="padding: 10px 14px; background: rgba(255,140,26,0.05); border-radius: 8px; font-size: 12.5px;">🔋 حالة الاتصال بالشبكة</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       12 — CONTROL CENTER
+       ============================================================ -->
+  <section class="slide" data-notes="مركز التحكم هو عقل النظام. شاشة واحدة تعرض الموقع بأكمله مع تفاصيل كل عامل.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>CONTROL CENTER · 12</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 11 · CONTROL CENTER</span>
+    <h2 class="slide-title">لوحة تحكم المسؤول — <span class="ac">الموقع كله في شاشة واحدة</span></h2>
+
+    <div class="glass" style="margin-top: 22px; padding: 0; overflow: hidden;">
+      <!-- Top bar of dashboard -->
+      <div style="background: rgba(20, 24, 36, 0.9); padding: 14px 22px; border-bottom: 1px solid rgba(255,140,26,0.2); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 20px; font-family: 'JetBrains Mono'; font-size: 11px;">
+          <span style="color: var(--success);">● 47 عامل متصل</span>
+          <span style="color: var(--primary);">⚠️ 2 تنبيهات نشطة</span>
+          <span style="color: var(--text-soft);">📍 موقع الرياض - Sector 3</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--text-soft);">14:32:08</span>
+      </div>
+
+      <!-- Main grid -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0;">
+        <!-- Left: Map -->
+        <div style="padding: 18px; border-left: 1px solid rgba(255,140,26,0.15);">
+          <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 10px; letter-spacing: 1px;">🗺️ LIVE MAP</div>
+          <div style="background: rgba(10, 12, 20, 0.6); border-radius: 12px; height: 280px; position: relative; overflow: hidden; border: 1px solid rgba(255,140,26,0.1);">
+            <!-- نقاط العمال -->
+            <svg viewBox="0 0 500 280" fill="none" style="width: 100%; height: 100%;">
+              <!-- شبكة -->
+              <g stroke="rgba(255,140,26,0.06)" stroke-width="1">
+                <line x1="0" y1="70" x2="500" y2="70"/>
+                <line x1="0" y1="140" x2="500" y2="140"/>
+                <line x1="0" y1="210" x2="500" y2="210"/>
+                <line x1="125" y1="0" x2="125" y2="280"/>
+                <line x1="250" y1="0" x2="250" y2="280"/>
+                <line x1="375" y1="0" x2="375" y2="280"/>
+              </g>
+              <!-- العمال (خوذ سليمة) -->
+              <circle cx="80" cy="60" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="180" cy="100" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="320" cy="80" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="420" cy="130" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="100" cy="200" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="300" cy="220" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="440" cy="240" r="7" fill="#00d68f" opacity="0.8"/>
+              <circle cx="200" cy="180" r="7" fill="#00d68f" opacity="0.8"/>
+              <!-- عامل في منطقة خطرة -->
+              <circle cx="350" cy="180" r="10" fill="#ff8c1a" opacity="0.9">
+                <animate attributeName="r" values="10;14;10" dur="1.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="350" cy="180" r="20" fill="none" stroke="#ff8c1a" stroke-width="1" opacity="0.4"/>
+              <!-- عامل في خطر -->
+              <circle cx="250" cy="150" r="12" fill="#ff2e4d">
+                <animate attributeName="r" values="12;16;12" dur="1s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="250" cy="150" r="28" fill="none" stroke="#ff2e4d" stroke-width="2" opacity="0.5">
+                <animate attributeName="r" values="20;40" dur="1.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.6;0" dur="1.5s" repeatCount="indefinite"/>
+              </circle>
+              <!-- تسمية -->
+              <text x="250" y="135" text-anchor="middle" font-family="Cairo" font-size="11" fill="#ff2e4d" font-weight="700">07 ⚠️</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Right: Active incident -->
+        <div style="padding: 18px;">
+          <div style="font-size: 11px; color: var(--text-soft); margin-bottom: 10px; letter-spacing: 1px;">🚨 ACTIVE INCIDENT</div>
+          <div style="background: rgba(255, 46, 77, 0.08); border: 1px solid rgba(255, 46, 77, 0.3); border-radius: 12px; padding: 14px;">
+            <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--danger); margin-bottom: 6px;">#INCIDENT-2847</div>
+            <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">سقوط جسم على خوذة</div>
+            <div style="font-size: 11px; color: var(--text-mid); line-height: 1.8;">
+              👤 العامل: <span style="color: var(--text);">محمد الأحمد (ID: 07)</span><br>
+              📍 الموقع: <span style="color: var(--text);">Sector 3 · Tower B</span><br>
+              ⏱️ الوقت: <span style="color: var(--text);">14:32:08</span><br>
+              📊 الخطورة: <span style="color: var(--danger);">عالية</span>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <button style="flex: 1; padding: 6px 8px; background: var(--danger); color: white; border: none; border-radius: 6px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer;">🎥 فيديو</button>
+              <button style="flex: 1; padding: 6px 8px; background: rgba(255,140,26,0.15); color: var(--primary); border: 1px solid var(--primary); border-radius: 6px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer;">🗺️ موقع</button>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; color: var(--text-soft); margin: 16px 0 8px; letter-spacing: 1px;">📊 STATUS</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="padding: 10px; background: rgba(0, 214, 143, 0.08); border-radius: 8px;">
+              <div style="font-family: 'Space Grotesk'; font-size: 20px; font-weight: 700; color: var(--success);">45</div>
+              <div style="font-size: 10px; color: var(--text-soft);">آمن</div>
+            </div>
+            <div style="padding: 10px; background: rgba(255, 46, 77, 0.08); border-radius: 8px;">
+              <div style="font-family: 'Space Grotesk'; font-size: 20px; font-weight: 700; color: var(--danger);">1</div>
+              <div style="font-size: 10px; color: var(--text-soft);">حالة حرجة</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       13 — AI LAYER
+       ============================================================ -->
+  <section class="slide" data-notes="الذكاء الاصطناعي مساعد وليس بديلاً. مهمته تقليل الإنذارات الكاذبة، وتصنيف الحوادث، وتوقع الأنماط.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>AI LAYER · 13</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 12 · AI LAYER</span>
+    <h2 class="slide-title">الذكاء الاصطناعي — <span class="ac">مساعد المشرف، ليس بديلاً</span></h2>
+
+    <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 22px;">
+      <div class="card">
+        <div class="ic">🎯</div>
+        <h4>تصنيف الحوادث</h4>
+        <p>يميز بين: سقوط، اصطدام، إغماء، سقوط جسم، دخول منطقة خطرة — بدقة عالية.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🚫</div>
+        <h4>تقليل الإنذارات الكاذبة</h4>
+        <p>لا يُطلق إنذاراً كاملاً بسبب حركة سريعة عادية، أو انحناء، أو هبوط لالتقاط أداة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📊</div>
+        <h4>تحليل الأنماط</h4>
+        <p>يكتشف المخاطر المتكررة: "هذه المنطقة يحدث فيها ازدحام يومياً عند الساعة 10 صباحاً".</p>
+      </div>
+      <div class="card">
+        <div class="ic">📈</div>
+        <h4>توقع المخاطر</h4>
+        <p>بناءً على البيانات التاريخية، يقترح على المشرف تعديلات في توزيع العمال أو المعدات.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🔬</div>
+        <h4>تحليل ما بعد الحادث</h4>
+        <p>يعرض تسلسل الأحداث الدقيقة: ماذا حدث في الثواني العشر الأخيرة قبل الحادث؟</p>
+      </div>
+      <div class="card">
+        <div class="ic">🎥</div>
+        <h4>تحليل الفيديو</h4>
+        <p>يتعرف على سلوكيات غير طبيعية في الفيديو: تعثر، انحناء خطر، اقتراب مفرط من حافة.</p>
+      </div>
+    </div>
+
+    <div class="glass" style="margin-top: 20px; text-align: center; border-color: rgba(0, 184, 255, 0.3);">
+      <div style="font-size: 13.5px; color: #d0d8ec; line-height: 1.9;">
+        <strong style="color: var(--info);">🤖 المبدأ الأساسي:</strong> الذكاء الاصطناعي يقترح، والمشرف يقرر. لا قرار آلي في حالات الطوارئ الحقيقية — دائماً هناك إنسان في الحلقة.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       14 — EMERGENCY SCENARIO
+       ============================================================ -->
+  <section class="slide" data-notes="هنا نعرض السيناريو الكامل خطوة بخطوة. من لحظة السقوط إلى وصول الإسعاف. كل ثانية مهمة.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>SCENARIO · 14</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 13 · EMERGENCY SCENARIO</span>
+    <h2 class="slide-title">سيناريو كامل — <span class="danger">عامل يسقط</span></h2>
+
+    <div style="margin-top: 20px;">
+      <div class="flow" style="gap: 6px; flex-direction: column; align-items: stretch;">
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--danger); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">1</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--danger);">السقوط:</strong> العامل ينزلق من ارتفاع 3 أمتار. رأسه يرتطم بالأرض.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--primary); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">2</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--primary);">الكشف (أقل من 100ms):</strong> حساس التسارع يقفز، الميلان يتغير، حساس الصدمة يقرأ ارتطاماً قوياً.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--info); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">3</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--info);">تأكيد AI:</strong> المعالج يعمل محلياً — يتأكد خلال 1-2 ثانية أن هذا حادث حقيقي وليس حركة عادية.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--secondary); color: #0a0a0f; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">4</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--secondary);">بث للشبكة:</strong> الخوذة تبث إشارة طوارئ عبر Mesh. تصل لكل خوذة في الموقع خلال ثوانٍ.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--primary); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">5</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--primary);">تحذير العمال:</strong> الخوذ القريبة تهتز وتصدر صوتاً. كل عامل يعلم أن هناك حادثاً قريباً.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--info); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">6</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--info);">تحديد الموقع:</strong> النظام يحدد موقع العامل بدقة 20 سم داخل المبنى.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--danger); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">7</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--danger);">تسجيل الفيديو:</strong> الكاميرا تجمّد الـ 10 ثوانٍ السابقة، وتبدأ تسجيل 30 ثانية قادمة.</div>
+        </div>
+        <div style="text-align: center; color: var(--primary); font-size: 14px;">↓</div>
+
+        <div class="glass" style="padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-color: rgba(0,214,143,0.4);">
+          <span style="background: var(--success); color: white; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; flex-shrink: 0;">8</span>
+          <div style="font-size: 12.5px;"><strong style="color: var(--success);">وصول الإنقاذ:</strong> لوحة المشرف تعرض الحادث كاملاً. فريق الإسعاف يتجه للموقع الدقيق. أقل من 90 ثانية من لحظة السقوط.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       15 — USE CASES
+       ============================================================ -->
+  <section class="slide" data-notes="عشر حالات واقعية. كل حالة تُظهر قوة النظام في سياق مختلف.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>USE CASES · 15</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 14 · USE CASES</span>
+    <h2 class="slide-title">عشر حالات <span class="ac">تُظهر قوة النظام</span></h2>
+
+    <table style="margin-top: 22px; font-size: 11.5px;">
+      <thead>
+        <tr>
+          <th style="width: 22%;">الحالة</th>
+          <th style="width: 22%;">ما تكتشفه الخوذة</th>
+          <th style="width: 28%;">ردّ فعل النظام</th>
+          <th>المستوى</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. سقوط من ارتفاع</strong></td>
+          <td>تسارع + ميلان + صدمة</td>
+          <td>إطلاق طوارئ كاملة + تحديد موقع + فيديو</td>
+          <td class="center"><span class="badge" style="background:rgba(255,46,77,0.15);color:var(--danger);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 4</span></td>
+        </tr>
+        <tr>
+          <td><strong>2. سقوط جسم على الخوذة</strong></td>
+          <td>صدمة قوية مفاجئة</td>
+          <td>تحذير العمال + إبلاغ المشرف + بدء التسجيل</td>
+          <td class="center"><span class="badge" style="background:rgba(255,140,26,0.15);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 3</span></td>
+        </tr>
+        <tr>
+          <td><strong>3. انهيار جزئي</strong></td>
+          <td>عدة عوامل: صدمة + سكون</td>
+          <td>طوارئ جماعية + إخلاء المنطقة</td>
+          <td class="center"><span class="badge" style="background:rgba(255,46,77,0.15);color:var(--danger);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 4</span></td>
+        </tr>
+        <tr>
+          <td><strong>4. دخول منطقة خطرة</strong></td>
+          <td>الموقع داخل منطقة محظورة</td>
+          <td>تنبيه العامل + تحذير المشرف</td>
+          <td class="center"><span class="badge" style="background:rgba(255,214,10,0.15);color:var(--secondary);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>5. ارتفاع حرارة خطير</strong></td>
+          <td>حرارة الجسم + البيئة مرتفعة</td>
+          <td>تنبيه العامل + إبلاغ المشرف + توصية بالاستراحة</td>
+          <td class="center"><span class="badge" style="background:rgba(255,214,10,0.15);color:var(--secondary);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>6. تسرب غاز</strong></td>
+          <td>حساس الغاز يحذّر</td>
+          <td>إخلاء فوري + إبلاغ مركز التحكم</td>
+          <td class="center"><span class="badge" style="background:rgba(255,46,77,0.15);color:var(--danger);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 4</span></td>
+        </tr>
+        <tr>
+          <td><strong>7. فقدان الاتصال</strong></td>
+          <td>انقطاع الإشارة</td>
+          <td>تنبيه المشرف + البحث عن العامل</td>
+          <td class="center"><span class="badge" style="background:rgba(255,140,26,0.15);color:var(--primary);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 3</span></td>
+        </tr>
+        <tr>
+          <td><strong>8. سكون غير طبيعي</strong></td>
+          <td>لا حركة لأكثر من 30 ثانية</td>
+          <td>تحذير العامل + استفسار تلقائي من الشبكة</td>
+          <td class="center"><span class="badge" style="background:rgba(255,214,10,0.15);color:var(--secondary);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 2</span></td>
+        </tr>
+        <tr>
+          <td><strong>9. حالة طبية طارئة</strong></td>
+          <td>زر SOS + مؤشرات حيوية</td>
+          <td>طوارئ طبية + إبلاغ الإسعاف</td>
+          <td class="center"><span class="badge" style="background:rgba(255,46,77,0.15);color:var(--danger);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 4</span></td>
+        </tr>
+        <tr>
+          <td><strong>10. تصادم مع معدة</strong></td>
+          <td>صدمة قوية من اتجاه معين</td>
+          <td>تحذير + إبلاغ + فيديو + كشف المعدة المتسببة</td>
+          <td class="center"><span class="badge" style="background:rgba(255,46,77,0.15);color:var(--danger);padding:3px 10px;border-radius:12px;font-size:10px;">المستوى 4</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============================================================
+       16 — COMPARISON
+       ============================================================ -->
+  <section class="slide" data-notes="المقارنة الحاسمة. الخوذة التقليدية تحمي الرأس. SmartGuard تحمي الحياة.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>COMPARISON · 16</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 15 · COMPETITIVE ADVANTAGE</span>
+    <h2 class="slide-title">SmartGuard vs. <span class="ac">الخوذة التقليدية</span></h2>
+
+    <table style="margin-top: 22px;">
+      <thead>
+        <tr>
+          <th style="width: 28%;">الميزة</th>
+          <th style="width: 24%;">الخوذة التقليدية</th>
+          <th>SmartGuard Helmet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>حماية الرأس</strong></td>
+          <td class="center"><span class="check">✓</span></td>
+          <td class="center"><span class="check">✓</span> + إضافية</td>
+        </tr>
+        <tr>
+          <td><strong>اكتشاف الحوادث تلقائياً</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> فوري</td>
+        </tr>
+        <tr>
+          <td><strong>سرعة الاستجابة</strong></td>
+          <td class="center">دقائق / ساعات</td>
+          <td class="center"><span class="check">✓</span> أقل من 90 ثانية</td>
+        </tr>
+        <tr>
+          <td><strong>اتصال بين العمال</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> شبكة Mesh كاملة</td>
+        </tr>
+        <tr>
+          <td><strong>تحديد الموقع</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> دقة 20 سم</td>
+        </tr>
+        <tr>
+          <td><strong>تسجيل الحوادث</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> فيديو + بيانات</td>
+        </tr>
+        <tr>
+          <td><strong>مراقبة حالة العامل</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> لحظياً</td>
+        </tr>
+        <tr>
+          <td><strong>تحليل البيانات</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> AI + لوحة تحكم</td>
+        </tr>
+        <tr>
+          <td><strong>الوقاية قبل الحادث</strong></td>
+          <td class="center"><span class="cross">✗</span></td>
+          <td class="center"><span class="check">✓</span> تحذيرات استباقية</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="glass" style="margin-top: 20px; text-align: center;">
+      <div style="font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.9;">
+        الخوذة التقليدية تمنع الاصطدام… <br>
+        <span style="color: var(--primary);">SmartGuard Helmet تمنع الكارثة.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       17 — PRIVACY
+       ============================================================ -->
+  <section class="slide" data-notes="الخصوصية أساس. الكاميرا تعمل فقط عند الحادث. البيانات مشفرة. لا مراقبة شخصية.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>PRIVACY · 17</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 16 · PRIVACY & SECURITY</span>
+    <h2 class="slide-title">الخصوصية والأمان — <span class="success">خط أحمر</span></h2>
+
+    <div class="cards-grid" style="margin-top: 22px;">
+      <div class="card">
+        <div class="ic">🔐</div>
+        <h4>تشفير كامل</h4>
+        <p>جميع الاتصالات بين الخوذ ومركز التحكم مشفرة بمعايير عسكرية (AES-256).</p>
+      </div>
+      <div class="card">
+        <div class="ic">📷</div>
+        <h4>الكاميرا لا تراقب</h4>
+        <p>تعمل فقط عند اكتشاف حادث. لا تسجيل مستمر. لا مراقبة يومية.</p>
+      </div>
+      <div class="card">
+        <div class="ic">🗑️</div>
+        <h4>حذف تلقائي</h4>
+        <p>الفيديوهات المرتبطة بحوادث عادية تُحذف بعد 30 يوماً. الحوادث الجسيمة تُحفظ فقط بموافقة.</p>
+      </div>
+      <div class="card">
+        <div class="ic">👤</div>
+        <h4>صلاحيات محددة</h4>
+        <p>من يستطيع مشاهدة الفيديو؟ فقط المشرف المصرح له. كل عملية وصول تُسجَّل.</p>
+      </div>
+      <div class="card">
+        <div class="ic">📋</div>
+        <h4>سجل تدقيق كامل</h4>
+        <p>كل من فتح ملفاً، شاهد فيديو، أو عدّل بيانات — يُسجَّل في سجل غير قابل للتلاعب.</p>
+      </div>
+      <div class="card">
+        <div class="ic">⚖️</div>
+        <h4>التزام قانوني</h4>
+        <p>النظام مصمم وفق لوائح حماية البيانات المحلية والدولية (GDPR، نظام حماية البيانات السعودي).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       18 — VERSIONS ROADMAP
+       ============================================================ -->
+  <section class="slide" data-notes="رؤيتنا طويلة المدى. نبدأ بإصدار بسيط ونتطور حتى النظام الكامل.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>ROADMAP · 18</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 17 · FUTURE VERSIONS</span>
+    <h2 class="slide-title">خارطة الطريق — <span class="ac">من خوذة إلى نظام مدينة</span></h2>
+
+    <div class="row" style="margin-top: 24px;">
+      <div class="col">
+        <div class="glass" style="border-color: rgba(0, 214, 143, 0.3);">
+          <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--success); margin-bottom: 8px;">VERSION 1 · 2027</div>
+          <h4 style="color: var(--text); margin-bottom: 10px;">خوذة + حساسات أساسية</h4>
+          <ul style="color: var(--text-mid); font-size: 12.5px; line-height: 1.9; padding-right: 20px;">
+            <li>تسارع + ميلان + صدمة</li>
+            <li>شبكة لاسلكية بين العمال</li>
+            <li>إنذار صوتي + هزاز</li>
+            <li>زر SOS</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col">
+        <div class="glass" style="border-color: rgba(255, 140, 26, 0.3);">
+          <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--primary); margin-bottom: 8px;">VERSION 2 · 2028</div>
+          <h4 style="color: var(--text); margin-bottom: 10px;">+ تحديد الموقع + الكاميرا</h4>
+          <ul style="color: var(--text-mid); font-size: 12.5px; line-height: 1.9; padding-right: 20px;">
+            <li>GPS + UWB</li>
+            <li>كاميرا ذكية</li>
+            <li>لوحة تحكم مركزية</li>
+            <li>حساسات الغاز والحرارة</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col">
+        <div class="glass" style="border-color: rgba(0, 184, 255, 0.3);">
+          <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--info); margin-bottom: 8px;">VERSION 3 · 2030</div>
+          <h4 style="color: var(--text); margin-bottom: 10px;">+ ذكاء اصطناعي متقدم</h4>
+          <ul style="color: var(--text-mid); font-size: 12.5px; line-height: 1.9; padding-right: 20px;">
+            <li>تحليل سلوكي بالذكاء الاصطناعي</li>
+            <li>تنبؤ بالمخاطر</li>
+            <li>تحليل فيديو ذكي</li>
+            <li>تكامل مع أنظمة السلامة الحالية</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col">
+        <div class="glass" style="border-color: rgba(255, 46, 77, 0.3);">
+          <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--danger); margin-bottom: 8px;">VERSION 4 · 2032</div>
+          <h4 style="color: var(--text); margin-bottom: 10px;">نظام مدينة كامل</h4>
+          <ul style="color: var(--text-mid); font-size: 12.5px; line-height: 1.9; padding-right: 20px;">
+            <li>خوذ + مركبات + معدات</li>
+            <li>مركز تحكم موحد</li>
+            <li>تكامل مع الدفاع المدني</li>
+            <li>تقارير تنبؤية للمناطق</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       19 — CHALLENGES
+       ============================================================ -->
+  <section class="slide" data-notes="نعرض التحديات بصدق. المشروع جاد، ونحن نعرف ما يحتاج حلاً.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>CHALLENGES · 19</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> 18 · CHALLENGES</span>
+    <h2 class="slide-title">التحديات <span class="ac">وحلولها</span></h2>
+
+    <table style="margin-top: 22px;">
+      <thead>
+        <tr>
+          <th style="width: 35%;">التحدي</th>
+          <th>الحل المقترح</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>🔋 عمر البطارية</strong></td>
+          <td>بطاريات عالية الكثافة + وضع توفير طاقة ذكي + محطة شحن سريعة</td>
+        </tr>
+        <tr>
+          <td><strong>📡 مدى الشبكة</strong></td>
+          <td>Mesh متعدد القفزات + Gateways متعددة في الموقع + خوارزمية توجيه ذكية</td>
+        </tr>
+        <tr>
+          <td><strong>⚖️ الوزن والحجم</strong></td>
+          <td>مكونات صغيرة الحجم + توزيع متوازن داخل الخوذة + خامات خفيفة الوزن</td>
+        </tr>
+        <tr>
+          <td><strong>💧 الظروف البيئية</strong></td>
+          <td>عزل IP67 ضد الماء والغبار + اختبارات حرارة واهتزاز صناعية</td>
+        </tr>
+        <tr>
+          <td><strong>🚫 الإنذارات الكاذبة</strong></td>
+          <td>دمج حساسات متعدد + AI متقدم + تدريب على بيانات حقيقية</td>
+        </tr>
+        <tr>
+          <td><strong>🔐 الخصوصية</strong></td>
+          <td>تشفير شامل + تخزين دائري + صلاحيات دقيقة + سجل تدقيق</td>
+        </tr>
+        <tr>
+          <td><strong>💰 التكلفة الأولية</strong></td>
+          <td>نماذج إيجار بدل شراء + إصدارات تدريجية + نماذج اشتراك</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============================================================
+       20 — END
+       ============================================================ -->
+  <section class="slide end" data-notes="اختم بالقصة الإنسانية. الهدف ليس تقنية، بل حياة عمال. كل خوذة هي شخص، وأسرة، ومستقبل.">
+    <div class="topbar">
+      <div class="l"><span class="dot"></span><span>CONCLUSION · 20</span></div>
+      <span>SMARTGUARD HELMET</span>
+    </div>
+
+    <span class="tag"><i></i> CONCLUSION</span>
+    <h2>نحن لا نصنع خوذة — <span class="primary">نحن نحفظ أرواحاً.</span></h2>
+
+    <div class="brand">SMARTGUARD</div>
+    <div class="tagline">SAFETY, REIMAGINED · MADE IN SAUDI ARABIA 🇸🇦</div>
+
+    <div style="margin-top: 40px; max-width: 800px; margin-left: auto; margin-right: auto; padding: 24px 32px; border-radius: 16px; background: rgba(255, 140, 26, 0.06); border: 1px solid rgba(255, 140, 26, 0.25);">
+      <div style="font-size: 15px; color: var(--text); line-height: 2; font-style: italic;">
+        «كل خوذة هي عامل. وكل عامل هو أب، أخ، أو ابن. <br>
+        SmartGuard Helmet ليس منتجاً تقنياً — بل وعد بأن يعود العامل إلى بيته سالماً.»
+      </div>
+    </div>
+
+    <div class="flow center" style="margin-top: 30px;">
+      <span class="node success">🛡️ حماية استباقية</span>
+      <span class="node hl">⚡ استجابة فورية</span>
+      <span class="node info">🤖 ذكاء اصطناعي</span>
+      <span class="node" style="border-color: var(--secondary); color: var(--secondary);">📊 بيانات ذكية</span>
+    </div>
+  </section>
+
+</div>
+
+<!-- PAGER -->
+<div class="pager" id="pager"></div>
+
+<!-- NAV -->
+<div class="nav">
+  <button id="prevBtn" title="السابق">◀</button>
+  <button id="nextBtn" title="التالي">▶</button>
+  <button id="notesBtn" title="ملاحظات المتحدث (N)">💬</button>
+</div>
+
+<!-- NOTES -->
+<div class="notes" id="notesBox"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const pager = document.getElementById('pager');
+  const notesBox = document.getElementById('notesBox');
+  let idx = 0;
+  let notesVisible = false;
+
+  slides.forEach((_, i) => {
+    const s = document.createElement('span');
+    if (i === 0) s.classList.add('on');
+    s.addEventListener('click', () => go(i));
+    pager.appendChild(s);
+  });
+
+  function go(n) {
+    if (n < 0 || n >= slides.length) return;
+    slides[idx].classList.remove('active');
+    pager.children[idx].classList.remove('on');
+    idx = n;
+    slides[idx].classList.add('active');
+    pager.children[idx].classList.add('on');
+    if (notesVisible) showNotes();
+  }
+  function next() { go(idx + 1); }
+  function prev() { go(idx - 1); }
+
+  document.getElementById('nextBtn').onclick = next;
+  document.getElementById('prevBtn').onclick = prev;
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); next();
+    }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault(); prev();
+    }
+    if (e.key.toLowerCase() === 'n') toggleNotes();
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(slides.length - 1); }
+  });
+
+  let tX = 0, tY = 0;
+  document.addEventListener('touchstart', e => {
+    tX = e.changedTouches[0].screenX;
+    tY = e.changedTouches[0].screenY;
+  });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - tX;
+    const dy = e.changedTouches[0].screenY - tY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx > 0) next(); else prev();
+    }
+  });
+
+  function showNotes() {
+    const t = slides[idx].getAttribute('data-notes') || '';
+    notesBox.innerHTML = '<b>SPEAKER NOTES · SLIDE ' + (idx + 1) + ' / ' + slides.length + '</b>' + t;
+  }
+  function toggleNotes() {
+    notesVisible = !notesVisible;
+    notesBox.classList.toggle('show', notesVisible);
+    document.getElementById('notesBtn').classList.toggle('on', notesVisible);
+    if (notesVisible) showNotes();
+  }
+  document.getElementById('notesBtn').onclick = toggleNotes;
+</script>
+
+</body>
+</html>
